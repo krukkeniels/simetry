@@ -138,16 +138,16 @@ pub struct PageFileGraphics {
     pub tyre_compound: [u16; 33],
     pub replay_time_multiplier: f32,
     pub normalized_car_position: f32,
-    pub active_cars: i32,
-    pub car_coordinates: [[f32; 3]; 60],
-    pub car_id: [i32; 60],
-    pub player_car_id: i32,
+    // In the official C++ struct, carCoordinates is a single array of 3 floats, not an array of arrays
+    pub car_coordinates_single: [f32; 3],
     pub penalty_time: f32,
     pub flag: FlagTypeRaw,
-    pub penalty: PenaltyRaw,
     pub ideal_line_on: i32,
     pub is_in_pit_lane: i32,
     pub surface_grip: f32,
+    
+    // The fields below were added after the original C++ struct.
+    // We'll keep them for backward compatibility but their values might not be accurate.
     pub mandatory_pit_done: i32,
     pub wind_speed: f32,
     pub wind_direction: f32,

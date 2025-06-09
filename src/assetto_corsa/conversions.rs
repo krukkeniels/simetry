@@ -93,7 +93,20 @@ impl From<FlagTypeRaw> for FlagType {
 
 impl From<PageFileGraphics> for Graphics {
     fn from(v: PageFileGraphics) -> Self {
-        let active_cars = v.active_cars.max(0) as usize;
+        // Since we've fixed the memory layout to match the C++ structure,
+        // we need to create defaults for fields that don't exist in the C++ structure
+        // but do exist in our Graphics struct
+        let active_cars = 1; // Default to 1 car (the player)
+        
+        // Create a Vec with just the player's car coordinates
+        let car_coordinates = vec![v.car_coordinates_single];
+        
+        // Default player ID and car IDs
+        let player_car_id = 0;
+        let car_id = vec![player_car_id];
+        
+        // Create a default penalty
+        let penalty = Penalty::None;
 
         Self {
             packet_id: v.packet_id,
@@ -117,13 +130,13 @@ impl From<PageFileGraphics> for Graphics {
             tyre_compound: extract_string(&v.tyre_compound),
             replay_time_multiplier: v.replay_time_multiplier,
             normalized_car_position: v.normalized_car_position,
-            active_cars: v.active_cars,
-            car_coordinates: combine_car_info(v.car_coordinates, active_cars),
-            car_id: combine_car_info(v.car_id, active_cars),
-            player_car_id: v.player_car_id,
+            active_cars: active_cars,
+            car_coordinates,
+            car_id,
+            player_car_id,
             penalty_time: v.penalty_time,
             flag: v.flag.into(),
-            penalty: v.penalty.into(),
+            penalty,
             ideal_line_on: v.ideal_line_on,
             is_in_pit_lane: v.is_in_pit_lane,
             surface_grip: v.surface_grip,
@@ -138,17 +151,18 @@ impl From<PageFileGraphics> for Graphics {
             engine_map: v.engine_map,
             abs: v.abs,
             fuel_used_per_lap: v.fuel_used_per_lap,
-            rain_lights: v.rain_lights,
-            flashing_lights: v.flashing_lights,
-            lights_stage: v.lights_stage,
-            exhaust_temperature: v.exhaust_temperature,
-            wiper_lv: v.wiper_lv,
-            driver_stint_total_time_left: v.driver_stint_total_time_left,
-            driver_stint_time_left: v.driver_stint_time_left,
-            rain_tyres: v.rain_tyres,
-            session_index: v.session_index,
-            used_fuel: v.used_fuel,
-            delta_lap_time: extract_string(&v.delta_lap_time),
+            // For the rest of the fields, provide default values since they don't exist in the original C++ struct
+            rain_lights: 0,
+            flashing_lights: 0,
+            lights_stage: 0,
+            exhaust_temperature: 0.0,
+            wiper_lv: 0,
+            driver_stint_total_time_left: 0,
+            driver_stint_time_left: 0,
+            rain_tyres: 0,
+            session_index: 0,
+            used_fuel: 0.0,
+            delta_lap_time: String::new(),
             i_delta_lap_time: v.i_delta_lap_time,
             estimated_lap_time: extract_string(&v.estimated_lap_time),
             i_estimated_lap_time: v.i_estimated_lap_time,
